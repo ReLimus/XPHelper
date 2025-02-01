@@ -43,7 +43,6 @@ public class InjectHook implements IXposedHookLoadPackage, IXposedHookZygoteInit
     private void entryHook(Context context) {
         //初始化context
         XpHelper.initContext(context);
-
         //进入自己的Hook逻辑
         hookSteps.initHook(context);
     }
