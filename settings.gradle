@@ -18,6 +18,6 @@ dependencyResolutionManagement {
         maven { url = uri("https://api.xposed.info/") }
     }
 }
-rootProject.name = "XpHelper"
+rootProject.name = "XPHelper"
 include ':app'
 include ':xphelper'
