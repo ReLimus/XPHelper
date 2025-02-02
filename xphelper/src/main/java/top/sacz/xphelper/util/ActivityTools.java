@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ActivityTools {
-    public static ResourcesLoader resourcesLoader = null;
+    private static ResourcesLoader resourcesLoader = null;
 
     /**
      * 获取所有声明在AndroidManifest中已经有注册过的activityInfo

@@ -32,57 +32,111 @@ public class MethodFinder {
     private String[] searchPackages;
     private String[] excludePackages;
 
+    /**
+     * 构造实例
+     * @return
+     */
     public static MethodFinder build() {
         return new MethodFinder();
     }
 
+    /**
+     * 设置方法声明类
+     * @param declaredClass
+     * @return
+     */
     public MethodFinder declaredClass(Class<?> declaredClass) {
         this.declaredClass = declaredClass;
         return this;
     }
 
+    /**
+     * 设置方法的参数列表
+     * @param parameters
+     * @return
+     */
     public MethodFinder parameters(Class<?>... parameters) {
         this.parameters = parameters;
         return this;
     }
 
+    /**
+     * 设置方法名称
+     * @param name
+     * @return
+     */
     public MethodFinder methodName(String name) {
         methodName = name;
         return this;
     }
 
+    /**
+     * 设置方法的返回值类型
+     * @param returnTypeClass
+     * @return
+     */
     public MethodFinder returnType(Class<?> returnTypeClass) {
         returnType = returnTypeClass;
         return this;
     }
 
+    /**
+     * 设置方法中调用的方法列表
+     * @param methods
+     * @return
+     */
     public MethodFinder invokeMethods(Method... methods) {
         invokeMethods = methods;
         return this;
     }
 
+    /**
+     * 设置调用了该方法的方法列表(也就是此方法被哪些方法调用)
+     * @param methods
+     * @return
+     */
     public MethodFinder callMethods(Method... methods) {
         this.callMethods = methods;
         return this;
     }
 
+    /**
+     * 设置方法中使用的数字列表
+     * @param numbers
+     * @return
+     */
     public MethodFinder usingNumbers(long... numbers) {
         this.usingNumbers = numbers;
         return this;
     }
 
+    /**
+     * 设置参数数量
+     * @param count
+     * @return
+     */
     public MethodFinder paramCount(int count) {
         this.paramCount = count;
         this.isParamCount = true;
         return this;
     }
 
-
+    /**
+     * 设置方法中使用的字符串列表
+     * @param strings
+     * @return
+     */
     public MethodFinder useString(String... strings) {
         this.stringContent = strings;
         return this;
     }
 
+    /**
+     * 设置方法的修饰符
+     * @param modifiers
+     * @param matchType
+     * @return
+     */
     public MethodFinder modifiers(int modifiers, MatchType matchType) {
         this.modifiers = modifiers;
         this.isModifiers = true;
@@ -90,11 +144,21 @@ public class MethodFinder {
         return this;
     }
 
+    /**
+     * 设置搜索的包名列表
+     * @param strings
+     * @return
+     */
     public MethodFinder searchPackages(String... strings) {
         this.searchPackages = strings;
         return this;
     }
 
+    /**
+     * 设置排除的包名列表
+     * @param strings
+     * @return
+     */
     public MethodFinder excludePackages(String... strings) {
         this.excludePackages = strings;
         return this;
@@ -155,40 +219,51 @@ public class MethodFinder {
         return methodMatcher;
     }
 
-    public List<Method> find() throws NoSuchMethodException {
-        //先查缓存
-        List<Method> cache = DexKitCache.getMethodList(toString());
-        if (!cache.isEmpty()) {
-            return cache;
-        }
-        ArrayList<Method> methods = new ArrayList<>();
-        //使用dexkit查找方法
-        MethodDataList methodDataList = DexFinder.getDexKitBridge().findMethod(buildFindMethod());
-        if (methodDataList.isEmpty()) {
+    /**
+     * 查找方法 返回结果列表
+     * @return
+     * @throws NoSuchMethodException
+     */
+    public List<Method> find()  {
+        try {
+            //先查缓存
+            List<Method> cache = DexKitCache.getMethodList(toString());
+            if (!cache.isEmpty()) {
+                return cache;
+            }
+            ArrayList<Method> methods = new ArrayList<>();
+            //使用dexkit查找方法
+            MethodDataList methodDataList = DexFinder.getDexKitBridge().findMethod(buildFindMethod());
+            if (methodDataList.isEmpty()) {
+                return methods;
+            }
+            for (MethodData methodData : methodDataList) {
+                Method method = methodData.getMethodInstance(ClassUtils.getClassLoader());
+                method.setAccessible(true);
+                methods.add(method);
+            }
+            //写入缓存
+            DexKitCache.putMethodList(toString(), methods);
             return methods;
+        } catch (NoSuchMethodException e) {
+            return new ArrayList<>();
         }
-        for (MethodData methodData : methodDataList) {
-            Method method = methodData.getMethodInstance(ClassUtils.getClassLoader());
-            method.setAccessible(true);
-            methods.add(method);
-        }
-        //写入缓存
-        DexKitCache.putMethodList(toString(), methods);
-        return methods;
     }
 
+    /**
+     * 查找方法 返回第一个方法 如果不存在则返回null
+     */
     public Method firstOrNull() {
-        try {
             List<Method> methods = find();
             if (methods.isEmpty()) {
                 return null;
             }
             return methods.get(0);
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
     }
 
+    /**
+     * 查找方法 返回第一个方法 如果不存在则抛出异常
+     */
     public Method first() throws Exception {
         List<Method> methods = find();
         if (methods.isEmpty()) {
