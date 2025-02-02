@@ -38,7 +38,10 @@ public class DexFinder {
             return;
         }
         if (!isLoadLibrary.getAndSet(true)) {
-            System.loadLibrary("dexkit");
+            try {
+                System.loadLibrary("dexkit");
+            } catch (Exception e) {
+            }
         }
         dexKitBridge = DexKitBridge.create(apkPath);
     }

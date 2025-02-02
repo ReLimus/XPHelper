@@ -12,7 +12,7 @@ import io.fastkv.interfaces.FastCipher
  * 完整构造方法 默认会生成无密码文件名为default的数据库
  * 如果需要加密传入密码
  */
-class KvHelper(id: String = "default", password: String = globalPassword) {
+class ConfigUtils(id: String = "default", password: String = globalPassword) {
 
     /**
      * 默认构造方法 会生成无密码文件名为default的数据库
@@ -138,12 +138,12 @@ class KvHelper(id: String = "default", password: String = globalPassword) {
     }
 
 
-    fun <T> getObject(key: String, type: Class<T>): T? {
+    fun <T> getObject(key: String, clz: Class<T>): T? {
         val data = kv.getString(key)
         if (data.isNullOrEmpty()) {
             return null
         }
-        return JSON.parseObject(data, type)
+        return JSON.parseObject(data, object : TypeReference<T>(clz) {})
     }
 
 

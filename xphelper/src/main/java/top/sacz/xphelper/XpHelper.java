@@ -7,7 +7,7 @@ import de.robv.android.xposed.IXposedHookZygoteInit;
 import top.sacz.xphelper.activity.ActivityProxyManager;
 import top.sacz.xphelper.reflect.ClassUtils;
 import top.sacz.xphelper.util.ActivityTools;
-import top.sacz.xphelper.util.KvHelper;
+import top.sacz.xphelper.util.ConfigUtils;
 
 public class XpHelper {
     @SuppressLint("StaticFieldLeak")
@@ -20,7 +20,7 @@ public class XpHelper {
         context = application;
         classLoader = application.getClassLoader();
         ClassUtils.intiClassLoader(classLoader);
-        KvHelper.initialize(application);
+        ConfigUtils.initialize(application);
         ActivityProxyManager.initActivityProxyManager(application);
     }
 
@@ -32,7 +32,7 @@ public class XpHelper {
      * 设置配置存储路径
      */
     public static void setConfigPath(String pathDir) {
-        KvHelper.initialize(pathDir);
+        ConfigUtils.initialize(pathDir);
     }
 
     /**
@@ -40,7 +40,7 @@ public class XpHelper {
      * @param password 密码 采用AES加密 不设置则不使用加密
      */
     public static void setConfigPassword(String password) {
-        KvHelper.setGlobalPassword(password);
+        ConfigUtils.setGlobalPassword(password);
     }
 
     /**
