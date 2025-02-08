@@ -143,7 +143,7 @@ class ConfigUtils(id: String = "default", password: String = globalPassword) {
         if (data.isNullOrEmpty()) {
             return null
         }
-        return JSON.parseObject(data, object : TypeReference<T>(clz) {})
+        return JSON.parseObject(data, clz)
     }
 
 
