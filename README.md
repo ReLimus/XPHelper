@@ -2,6 +2,9 @@
 
 ## 仓库最新版本 [![](https://jitpack.io/v/suzhelan/XpHelper.svg)](https://jitpack.io/#suzhelan/XpHelper)
 ---
+
+## [文档](https://github.com/suzhelan/XPHelper/wiki)
+
 ### 包含的功能
 
 - Field Method Constructor的快速查找与调用(带缓存)
@@ -10,7 +13,7 @@
 - 快速使用Dexkit来查找方法 并自动缓存方法与回收内存
 - 附带FastKV(Java编写,兼容性更好,传闻比MMKV效率更高)存储框架的封装类
 
-## [文档](https://github.com/suzhelan/XPHelper/wiki)
+
 ----
 ### 参考
 [EzxHelper](https://github.com/KyuubiRan/EzXHelper)  
