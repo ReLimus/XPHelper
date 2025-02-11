@@ -155,6 +155,15 @@ class ConfigUtils(id: String = "default", password: String = globalPassword) {
         return JSON.parseObject(data, type)
     }
 
+
+    fun <T> getList(key: String, clazz: Class<T>): MutableList<T> {
+        val data = kv.getString(key)
+        if (data.isNullOrEmpty()) {
+            return ArrayList()
+        }
+        return JSON.parseArray(data, clazz)
+    }
+
     /**
      * 清除所有key
      */
