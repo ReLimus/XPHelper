@@ -41,11 +41,18 @@ public class CheckClassType {
     }
 
     //缩小范围匹配字节引用类型
+
+    /**
+     *
+     * @param methodParamClz 方法参数
+     * @param convert 目标匹配参数 可传入实际参数的父类增加匹配范围,传入子类不会命中
+     */
     public static boolean checkType(Class<?> methodParamClz, Class<?> convert) {
         if (methodParamClz.equals(convert)) return true;
         if (methodParamClz.equals(hasWarpClass(convert))) return true;
         if (methodParamClz.equals(hasBaseClass(convert))) return true;
-        return methodParamClz.isAssignableFrom(convert);
+        //左边是不是右边的父类 在TextViw.class.isAssignableFrom(View.class)时为false , 可以避免一些问题
+        return convert.isAssignableFrom(methodParamClz);
     }
 
     private static Class<?> hasWarpClass(Class<?> targetClz) {
