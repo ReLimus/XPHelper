@@ -46,6 +46,7 @@ class ConfigUtils(id: String = "default", password: String = globalPassword) {
         private var storePath = ""
 
         private var globalPassword = ""
+
         /**
          * 初始化 传入文件夹路径
          */
@@ -58,6 +59,7 @@ class ConfigUtils(id: String = "default", password: String = globalPassword) {
         fun setGlobalPassword(password: String) {
             globalPassword = password
         }
+
         @JvmStatic
         fun initialize(context: Context) {
             storePath = context.filesDir.absolutePath + "/XpHelper"
@@ -165,6 +167,13 @@ class ConfigUtils(id: String = "default", password: String = globalPassword) {
     }
 
     /**
+     * 转Map
+     */
+    fun toMap(): Map<String, Any> {
+        return kv.all
+    }
+
+    /**
      * 清除所有key
      */
     fun clearAll() {
@@ -188,6 +197,7 @@ class ConfigUtils(id: String = "default", password: String = globalPassword) {
     fun containKey(key: String): Boolean {
         return kv.contains(key)
     }
+
 
     /**
      * fast kv的加密实现接口
