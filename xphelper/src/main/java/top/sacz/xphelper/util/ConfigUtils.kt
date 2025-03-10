@@ -12,17 +12,12 @@ import io.fastkv.interfaces.FastCipher
  * 完整构造方法 默认会生成无密码文件名为default的数据库
  * 如果需要加密传入密码
  */
-class ConfigUtils(id: String = "default", password: String = globalPassword) {
+class ConfigUtils @JvmOverloads constructor(
+    key: String = "default",
+    password: String = globalPassword
+) {
 
-    /**
-     * 默认构造方法 会生成无密码文件名为default的数据库
-     */
-    constructor() : this("default")
-
-    /**
-     * 构造方法 传入数据库名称
-     */
-    constructor(key: String) : this(key, globalPassword)
+    private var id: String = key
 
     private var kv: FastKV
 
