@@ -167,6 +167,13 @@ class ConfigUtils(id: String = "default", password: String = globalPassword) {
     }
 
     /**
+     * 批量保存数据
+     */
+    fun putAll(map: Map<String, Any>) {
+        kv.putAll(map)
+    }
+
+    /**
      * 转Map
      */
     fun toMap(): Map<String, Any> {
