@@ -6,6 +6,7 @@ import org.luckypray.dexkit.query.matchers.MethodMatcher;
 import org.luckypray.dexkit.result.MethodData;
 import org.luckypray.dexkit.result.MethodDataList;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ public class MethodFinder {
     private Class<?>[] parameters;//方法的参数列表
     private String methodName;//方法名称
     private Class<?> returnType;//方法的返回值类型
-    private String[] stringContent;//方法中使用的字符串列表
+    private String[] usedString;//方法中使用的字符串列表
     private Method[] invokeMethods;//方法中调用的方法列表
     private Method[] callMethods;//调用了该方法的方法列表
     private long[] usingNumbers;//方法中使用的数字列表
@@ -32,8 +33,11 @@ public class MethodFinder {
     private String[] searchPackages;
     private String[] excludePackages;
 
+    private FieldFinder[] usedFields;
+
     /**
      * 构造实例
+     *
      * @return
      */
     public static MethodFinder build() {
@@ -41,7 +45,61 @@ public class MethodFinder {
     }
 
     /**
+     * Method转Dexkit的MethodMatcher
+     *
+     * @param method
+     * @return
+     */
+    public static MethodMatcher toMethodMatcher(Method method) {
+        return MethodMatcher.create(method);
+    }
+
+    /**
+     * 通过Method构造实例
+     *
+     * @param method
+     * @return
+     */
+    public static MethodFinder from(Method method) {
+        MethodFinder methodFinder = new MethodFinder();
+        methodFinder.declaredClass = method.getDeclaringClass();
+        methodFinder.parameters = method.getParameterTypes();
+        methodFinder.methodName = method.getName();
+        methodFinder.returnType = method.getReturnType();
+        methodFinder.isModifiers = true;
+        methodFinder.modifiers = method.getModifiers();
+        methodFinder.matchType = MatchType.Equals;
+        return methodFinder;
+    }
+
+    /**
+     * 设置方法中调用的字段列表
+     *
+     * @param fieldFinders
+     * @return
+     */
+    public MethodFinder usedField(FieldFinder... fieldFinders) {
+        usedFields = fieldFinders;
+        return this;
+    }
+
+    /**
+     * 设置方法中调用的字段列表
+     *
+     * @param fields
+     * @return
+     */
+    public MethodFinder usedField(Field... fields) {
+        usedFields = new FieldFinder[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            usedFields[i] = FieldFinder.from(fields[i]);
+        }
+        return this;
+    }
+
+    /**
      * 设置方法声明类
+     *
      * @param declaredClass
      * @return
      */
@@ -52,6 +110,7 @@ public class MethodFinder {
 
     /**
      * 设置方法的参数列表
+     *
      * @param parameters
      * @return
      */
@@ -62,6 +121,7 @@ public class MethodFinder {
 
     /**
      * 设置方法名称
+     *
      * @param name
      * @return
      */
@@ -72,6 +132,7 @@ public class MethodFinder {
 
     /**
      * 设置方法的返回值类型
+     *
      * @param returnTypeClass
      * @return
      */
@@ -82,6 +143,7 @@ public class MethodFinder {
 
     /**
      * 设置方法中调用的方法列表
+     *
      * @param methods
      * @return
      */
@@ -92,6 +154,7 @@ public class MethodFinder {
 
     /**
      * 设置调用了该方法的方法列表(也就是此方法被哪些方法调用)
+     *
      * @param methods
      * @return
      */
@@ -102,6 +165,7 @@ public class MethodFinder {
 
     /**
      * 设置方法中使用的数字列表
+     *
      * @param numbers
      * @return
      */
@@ -112,6 +176,7 @@ public class MethodFinder {
 
     /**
      * 设置参数数量
+     *
      * @param count
      * @return
      */
@@ -123,16 +188,18 @@ public class MethodFinder {
 
     /**
      * 设置方法中使用的字符串列表
+     *
      * @param strings
      * @return
      */
     public MethodFinder useString(String... strings) {
-        this.stringContent = strings;
+        this.usedString = strings;
         return this;
     }
 
     /**
      * 设置方法的修饰符
+     *
      * @param modifiers
      * @param matchType
      * @return
@@ -146,6 +213,7 @@ public class MethodFinder {
 
     /**
      * 设置搜索的包名列表
+     *
      * @param strings
      * @return
      */
@@ -156,6 +224,7 @@ public class MethodFinder {
 
     /**
      * 设置排除的包名列表
+     *
      * @param strings
      * @return
      */
@@ -176,7 +245,12 @@ public class MethodFinder {
         return findMethod.matcher(buildMethodMatcher());
     }
 
-    private MethodMatcher buildMethodMatcher() {
+
+    /**
+     * 构造dexkit method方法的匹配条件
+     * @return
+     */
+    public MethodMatcher buildMethodMatcher() {
         MethodMatcher methodMatcher = MethodMatcher.create();
         if (declaredClass != null) {
             methodMatcher.declaredClass(declaredClass);
@@ -187,12 +261,17 @@ public class MethodFinder {
         if (returnType != null) {
             methodMatcher.returnType(returnType);
         }
-        if (stringContent != null && stringContent.length != 0) {
-            methodMatcher.usingStrings(stringContent);
+        if (usedString != null && usedString.length != 0) {
+            methodMatcher.usingStrings(usedString);
         }
         if (parameters != null) {
             for (Class<?> parameterClass : parameters) {
                 methodMatcher.addParamType(parameterClass);
+            }
+        }
+        if (usedFields != null) {
+            for (FieldFinder usedField : usedFields) {
+                methodMatcher.addUsingField(usedField.buildFieldMatcher());
             }
         }
         if (invokeMethods != null) {
@@ -221,20 +300,22 @@ public class MethodFinder {
 
     /**
      * 查找方法 返回结果列表
+     *
      * @return
      * @throws NoSuchMethodException
      */
-    public List<Method> find()  {
+    public List<Method> find() {
         try {
             //先查缓存
             List<Method> cache = DexKitCache.getMethodList(toString());
-            if (!cache.isEmpty()) {
+            if (cache != null) {
                 return cache;
             }
             ArrayList<Method> methods = new ArrayList<>();
             //使用dexkit查找方法
             MethodDataList methodDataList = DexFinder.getDexKitBridge().findMethod(buildFindMethod());
             if (methodDataList.isEmpty()) {
+                DexKitCache.putMethodList(toString(), methods);
                 return methods;
             }
             for (MethodData methodData : methodDataList) {
@@ -254,11 +335,11 @@ public class MethodFinder {
      * 查找方法 返回第一个方法 如果不存在则返回null
      */
     public Method firstOrNull() {
-            List<Method> methods = find();
-            if (methods.isEmpty()) {
-                return null;
-            }
-            return methods.get(0);
+        List<Method> methods = find();
+        if (methods.isEmpty()) {
+            return null;
+        }
+        return methods.get(0);
     }
 
     /**
@@ -304,8 +385,8 @@ public class MethodFinder {
         if (isModifiers) {
             builder.append(modifiers);
         }
-        if (stringContent != null && stringContent.length != 0) {
-            builder.append(Arrays.toString(stringContent));
+        if (usedString != null && usedString.length != 0) {
+            builder.append(Arrays.toString(usedString));
         }
         if (searchPackages != null) {
             builder.append(Arrays.toString(searchPackages));

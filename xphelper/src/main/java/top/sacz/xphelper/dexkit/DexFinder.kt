@@ -1,21 +1,19 @@
-package top.sacz.xphelper.dexkit;
+package top.sacz.xphelper.dexkit
 
-import org.luckypray.dexkit.DexKitBridge;
+import org.luckypray.dexkit.DexKitBridge
+import top.sacz.xphelper.XpHelper
+import top.sacz.xphelper.dexkit.cache.DexKitCache
+import top.sacz.xphelper.dexkit.ext.MethodInfo
+import java.util.Timer
+import java.util.TimerTask
+import java.util.concurrent.atomic.AtomicBoolean
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
+object DexFinder {
+    private val isLoadLibrary = AtomicBoolean()
+    private var dexKitBridge: DexKitBridge? = null
+    private var timer: Timer? = null
 
-import top.sacz.xphelper.XpHelper;
-import top.sacz.xphelper.dexkit.cache.DexKitCache;
-
-public class DexFinder {
-
-    private static final AtomicBoolean isLoadLibrary = new AtomicBoolean();
-    private static DexKitBridge dexKitBridge;
-    private static Timer timer;
-
-    private static long autoCloseTime = 10 * 1000;
+    private var autoCloseTime = (10 * 1000).toLong()
 
     /**
      * 设置关闭的时间 超过此时间没有使用dexkit 则自动关闭 (其实有可能查找过程中被关闭)
@@ -24,8 +22,8 @@ public class DexFinder {
      *
      * @param time 单位毫秒
      */
-    public static void setAutoCloseTime(long time) {
-        autoCloseTime = time;
+    fun setAutoCloseTime(time: Long) {
+        autoCloseTime = time
     }
 
     /**
@@ -33,66 +31,72 @@ public class DexFinder {
      *
      * @param apkPath
      */
-    public synchronized static void create(String apkPath) {
+    @Synchronized
+    fun create(apkPath: String) {
         if (dexKitBridge != null) {
-            return;
+            return
         }
         if (!isLoadLibrary.getAndSet(true)) {
             try {
-                System.loadLibrary("dexkit");
-            } catch (Exception e) {
+                System.loadLibrary("dexkit")
+            } catch (e: Exception) {
             }
         }
-        dexKitBridge = DexKitBridge.create(apkPath);
+        dexKitBridge = DexKitBridge.create(apkPath)
     }
 
     /**
      * 得到dexkit实例
      */
-    public static DexKitBridge getDexKitBridge() {
+    @JvmStatic
+    fun getDexKitBridge(): DexKitBridge? {
         if (dexKitBridge == null) {
-            create(XpHelper.context.getApplicationInfo().sourceDir);
+            create(XpHelper.context.applicationInfo.sourceDir)
         }
-        resetTimer();
-        return dexKitBridge;
+        resetTimer()
+        return dexKitBridge
+    }
+
+    fun findMethodOrNull(methodInfo : MethodInfo.() -> Unit) : MethodFinder {
+        val newInfo = MethodInfo().also(methodInfo)
+        return newInfo.generate()
     }
 
     /**
      * 清空缓存
      */
-    public static void clearCache() {
-        DexKitCache.clearCache();
+    fun clearCache() {
+        DexKitCache.clearCache()
     }
 
-    private static void resetTimer() {
+    private fun resetTimer() {
         if (autoCloseTime <= 0) {
-            return;
+            return
         }
         //如果存在则取消 达到重置时间的效果
         if (timer != null) {
-            timer.cancel();
+            timer!!.cancel()
         }
         //定时 10秒钟后关闭
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                close();
+        timer = Timer()
+        timer!!.schedule(object : TimerTask() {
+            override fun run() {
+                close()
             }
-        }, autoCloseTime); // 10 seconds
+        }, autoCloseTime) // 10 seconds
     }
 
     /**
      * 释放dexkit资源
      */
-    public static void close() {
+    fun close() {
         if (dexKitBridge != null) {
-            dexKitBridge.close();
-            dexKitBridge = null;
+            dexKitBridge!!.close()
+            dexKitBridge = null
         }
         if (timer != null) {
-            timer.cancel();
-            timer = null;
+            timer!!.cancel()
+            timer = null
         }
     }
 }

@@ -47,6 +47,6 @@ dependencies {
     implementation("com.github.suzhelan.DialogX:DialogX:$dialogXVersion")
     //非必须 DialogX官方提供的主题样式
     implementation("com.github.suzhelan.DialogX:DialogXMaterialYou:$dialogXVersion")
-//    implementation project(":xphelper")
-    implementation 'com.github.suzhelan:XpHelper:v1.2'
+    implementation project(":xphelper")
+//    implementation 'com.github.suzhelan:XpHelper:v1.2'
 }

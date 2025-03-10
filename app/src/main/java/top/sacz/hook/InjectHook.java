@@ -11,6 +11,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import top.sacz.xphelper.XpHelper;
+import top.sacz.xphelper.dexkit.DexFinder;
 
 public class InjectHook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 

@@ -201,7 +201,7 @@ class ConfigUtils(id: String = "default", password: String = globalPassword) {
     /**
      * 是否包含某个key
      */
-    fun containKey(key: String): Boolean {
+    fun containsKey(key: String): Boolean {
         return kv.contains(key)
     }
 

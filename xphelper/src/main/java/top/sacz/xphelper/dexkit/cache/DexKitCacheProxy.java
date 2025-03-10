@@ -1,19 +1,20 @@
 package top.sacz.xphelper.dexkit.cache;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import top.sacz.xphelper.reflect.ClassUtils;
+import top.sacz.xphelper.reflect.FieldUtils;
 import top.sacz.xphelper.reflect.MethodUtils;
 import top.sacz.xphelper.util.ConfigUtils;
 
@@ -38,10 +39,12 @@ public class DexKitCacheProxy {
     }
 
     public List<Method> getMethodList(String key) {
+        if (!configUtils.containsKey(key)) {
+            return null;
+        }
         ArrayList<Method> result = new ArrayList<>();
         ArrayList<String> methodInfoList = configUtils.getObject(key, new TypeReference<>() {
         });
-        Log.d("Cache", "getMethodList: " + key);
         if (methodInfoList != null) {
             for (String methodInfo : methodInfoList) {
                 result.add(findMethodByJSONString(methodInfo));
@@ -81,6 +84,51 @@ public class DexKitCacheProxy {
         result.put("MethodName", methodName);
         result.put("Params", params);
         result.put("ReturnType", method.getReturnType().getName());
+        return result.toString();
+    }
+
+    public void putFieldList(String key, List<Field> fieldList) {
+        ArrayList<String> infoList = new ArrayList<>();
+        for (Field field : fieldList) {
+            infoList.add(getFieldInfoJSON(field));
+        }
+        configUtils.put(key, infoList);
+    }
+
+    public List<Field> getFieldList(String key) {
+        if (!configUtils.containsKey(key)) {
+            return null;
+        }
+        ArrayList<Field> result = new ArrayList<>();
+        ArrayList<String> fieldInfoList = configUtils.getObject(key, new TypeReference<>() {
+        });
+        if (fieldInfoList != null) {
+            for (String fieldInfo : fieldInfoList) {
+                result.add(findFieldByJSONString(fieldInfo));
+            }
+        }
+        return result;
+    }
+
+    private Field findFieldByJSONString(String fieldInfoStrJSON) {
+        JSONObject fieldInfo = JSONObject.parseObject(fieldInfoStrJSON);
+        String fieldName = fieldInfo.getString("FieldName");
+        String declareClass = fieldInfo.getString("DeclareClass");
+        String fieldType = fieldInfo.getString("FieldType");
+        return FieldUtils.create(declareClass)
+                .fieldName(fieldName)
+                .fieldType(ClassUtils.findClass(fieldType))
+                .first();
+    }
+
+    private String getFieldInfoJSON(Field field) {
+        field.setAccessible(true);
+        JSONObject result = new JSONObject();
+        String fieldName = field.getName();
+        String declareClass = field.getDeclaringClass().getName();
+        result.put("DeclareClass", declareClass);
+        result.put("FieldName", fieldName);
+        result.put("FieldType", field.getType().getName());
         return result.toString();
     }
 
