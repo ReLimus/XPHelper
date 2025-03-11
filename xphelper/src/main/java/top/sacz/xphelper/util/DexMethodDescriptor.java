@@ -211,6 +211,33 @@ public class DexMethodDescriptor implements Serializable {
         return toString().hashCode();
     }
 
+    public Constructor<?> getConstructorInstance(ClassLoader classLoader) throws NoSuchMethodException {
+        try {
+            Class<?> clz = classLoader.loadClass(
+                    declaringClass.substring(1, declaringClass.length() - 1).replace('/', '.'));
+            for (Constructor<?> m : clz.getConstructors()) {
+                if (m.getName().equals(name) && getConstructorTypeSig(m).equals(signature)) {
+                    return m;
+                }
+            }
+            while ((clz = clz.getSuperclass()) != null) {
+                for (Constructor<?> m : clz.getConstructors()) {
+                    if (Modifier.isPrivate(m.getModifiers()) || Modifier
+                            .isStatic(m.getModifiers())) {
+                        continue;
+                    }
+                    if (m.getName().equals(name) && getConstructorTypeSig(m).equals(signature)) {
+                        return m;
+                    }
+                }
+            }
+            throw new NoSuchMethodException(declaringClass + "->" + name + signature);
+        } catch (ClassNotFoundException e) {
+            throw (NoSuchMethodException) new NoSuchMethodException(
+                    declaringClass + "->" + name + signature).initCause(e);
+        }
+    }
+
     public Method getMethodInstance(ClassLoader classLoader) throws NoSuchMethodException {
         try {
             Class<?> clz = classLoader.loadClass(

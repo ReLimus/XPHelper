@@ -376,6 +376,9 @@ public class MethodFinder {
         if (callMethods != null) {
             builder.append(Arrays.toString(callMethods));
         }
+        if (usedFields != null) {
+            builder.append(Arrays.toString(usedFields));
+        }
         if (usingNumbers != null) {
             builder.append(Arrays.toString(usingNumbers));
         }

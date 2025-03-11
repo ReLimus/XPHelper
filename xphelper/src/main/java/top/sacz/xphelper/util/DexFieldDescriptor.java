@@ -1,6 +1,8 @@
 package top.sacz.xphelper.util;
 
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -28,6 +30,15 @@ public class DexFieldDescriptor {
         declaringClass = desc.substring(0, a);
         name = desc.substring(a + 2, b);
         type = desc.substring(b + 1);
+    }
+
+    public DexFieldDescriptor(Field field) {
+        if (field == null) {
+            throw new NullPointerException();
+        }
+        declaringClass = getTypeSig(field.getDeclaringClass());
+        name = field.getName();
+        type = getTypeSig(field.getType());
     }
 
     public DexFieldDescriptor(String clz, String n, String t) {
@@ -80,9 +91,13 @@ public class DexFieldDescriptor {
         return declaringClass.substring(1, declaringClass.length() - 1).replace('/', '.');
     }
 
+    public String getDescriptor() {
+        return declaringClass + "->" + name + ":" + type;
+    }
+
     @Override
     public String toString() {
-        return declaringClass + "->" + name + ":" + type;
+        return getDescriptor();
     }
 
     @Override
@@ -127,5 +142,6 @@ public class DexFieldDescriptor {
                     declaringClass + "->" + name + ":" + type).initCause(e);
         }
     }
+
 }
 

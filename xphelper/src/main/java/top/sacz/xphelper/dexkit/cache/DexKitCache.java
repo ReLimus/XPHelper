@@ -11,6 +11,10 @@ public class DexKitCache {
         new DexKitCacheProxy().clearCache();
     }
 
+    public static boolean exist(String key) {
+        return new DexKitCacheProxy().keys().contains(key);
+    }
+
     public static void putMethodList(String key, List<Method> methodList) {
         new DexKitCacheProxy().putMethodList(key, methodList);
     }

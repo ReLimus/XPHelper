@@ -1,8 +1,10 @@
 package top.sacz.xphelper.dexkit
 
+
 import org.luckypray.dexkit.DexKitBridge
 import top.sacz.xphelper.XpHelper
 import top.sacz.xphelper.dexkit.cache.DexKitCache
+import top.sacz.xphelper.dexkit.ext.FieldInfo
 import top.sacz.xphelper.dexkit.ext.MethodInfo
 import java.util.Timer
 import java.util.TimerTask
@@ -57,10 +59,16 @@ object DexFinder {
         return dexKitBridge
     }
 
-    fun findMethodOrNull(methodInfo : MethodInfo.() -> Unit) : MethodFinder {
+    fun findMethod(methodInfo: MethodInfo.() -> Unit): MethodFinder {
         val newInfo = MethodInfo().also(methodInfo)
         return newInfo.generate()
     }
+
+    fun findField(fieldInfo: FieldInfo.() -> Unit): FieldFinder {
+        val newInfo = FieldInfo().also(fieldInfo)
+        return newInfo.generate()
+    }
+
 
     /**
      * 清空缓存
