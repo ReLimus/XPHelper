@@ -4,8 +4,8 @@ package top.sacz.xphelper.dexkit
 import org.luckypray.dexkit.DexKitBridge
 import top.sacz.xphelper.XpHelper
 import top.sacz.xphelper.dexkit.cache.DexKitCache
-import top.sacz.xphelper.dexkit.ext.FieldInfo
-import top.sacz.xphelper.dexkit.ext.MethodInfo
+import top.sacz.xphelper.dexkit.bean.FieldInfo
+import top.sacz.xphelper.dexkit.bean.MethodInfo
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicBoolean

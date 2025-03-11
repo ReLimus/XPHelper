@@ -14,17 +14,22 @@ public class FieldUtils extends BaseFinder<Field> {
     private String fieldName;
 
 
-    public static Field getFieldByDesc(String desc) throws NoSuchMethodException {
+    public static Field getFieldByDescriptor(String desc) throws NoSuchMethodException {
         Field field = new DexFieldDescriptor(desc).getFieldInstance(ClassUtils.getClassLoader());
         field.setAccessible(true);
         return field;
     }
 
-    public static Field getFieldByDesc(String desc, ClassLoader classLoader) throws NoSuchMethodException {
+    public static Field getFieldByDescriptor(String desc, ClassLoader classLoader) throws NoSuchMethodException {
         Field field = new DexFieldDescriptor(desc).getFieldInstance(classLoader);
         field.setAccessible(true);
         return field;
     }
+
+    public static String getDescriptor(Field field) {
+        return new DexFieldDescriptor(field).getDescriptor();
+    }
+
     /**
      * 获取field值
      *

@@ -1,4 +1,4 @@
-package top.sacz.xphelper.dexkit.ext
+package top.sacz.xphelper.dexkit.bean
 
 import org.luckypray.dexkit.query.enums.MatchType
 import top.sacz.xphelper.dexkit.FieldFinder

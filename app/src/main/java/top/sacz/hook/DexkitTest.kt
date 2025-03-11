@@ -10,8 +10,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import top.sacz.hook.ext.showToast
 import top.sacz.xphelper.dexkit.DexFinder
-import top.sacz.xphelper.dexkit.ext.descriptor
-import top.sacz.xphelper.dexkit.ext.toMethodFinder
+import top.sacz.xphelper.ext.descriptor
+import top.sacz.xphelper.ext.toMethodFinder
 import top.sacz.xphelper.reflect.MethodUtils
 
 class DexkitTest {

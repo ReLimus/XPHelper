@@ -17,17 +17,19 @@ public class MethodUtils extends BaseFinder<Method> {
     private Class<?>[] methodParams;
     private Integer paramCount;
 
-    /**
-     * 通过方法签名获取方法对象
-     */
-    public static Method getMethodByDesc(String desc) throws NoSuchMethodException {
-        Method method = new DexMethodDescriptor(desc).getMethodInstance(ClassUtils.getClassLoader());
+
+    public static String getDescriptor(Method method) {
+        return new DexMethodDescriptor(method).getDescriptor();
+    }
+
+    public static Method getMethodByDescriptor(String desc) throws NoSuchMethodException {
+        Method method =  new DexMethodDescriptor(desc).getMethodInstance(ClassUtils.getClassLoader());
         method.setAccessible(true);
         return method;
     }
 
-    public static Method getMethodByDesc(String desc, ClassLoader classLoader) throws NoSuchMethodException {
-        Method method = new DexMethodDescriptor(desc).getMethodInstance(classLoader);
+    public static Method getMethodByDescriptor(String desc, ClassLoader classLoader) throws NoSuchMethodException {
+        Method method =  new DexMethodDescriptor(desc).getMethodInstance(classLoader);
         method.setAccessible(true);
         return method;
     }
