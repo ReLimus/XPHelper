@@ -78,7 +78,7 @@ public class MethodFinder {
      * @param fieldFinders
      * @return
      */
-    public MethodFinder usedField(FieldFinder... fieldFinders) {
+    public MethodFinder usedFields(FieldFinder... fieldFinders) {
         usedFields = fieldFinders;
         return this;
     }
@@ -89,7 +89,7 @@ public class MethodFinder {
      * @param fields
      * @return
      */
-    public MethodFinder usedField(Field... fields) {
+    public MethodFinder usedFields(Field... fields) {
         usedFields = new FieldFinder[fields.length];
         for (int i = 0; i < fields.length; i++) {
             usedFields[i] = FieldFinder.from(fields[i]);
@@ -192,7 +192,7 @@ public class MethodFinder {
      * @param strings
      * @return
      */
-    public MethodFinder useString(String... strings) {
+    public MethodFinder usedString(String... strings) {
         this.usedString = strings;
         return this;
     }

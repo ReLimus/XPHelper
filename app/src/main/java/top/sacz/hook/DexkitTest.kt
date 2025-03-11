@@ -10,7 +10,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import top.sacz.hook.ext.showToast
 import top.sacz.xphelper.dexkit.DexFinder
+import top.sacz.xphelper.dexkit.FieldFinder
+import top.sacz.xphelper.dexkit.MethodFinder
 import top.sacz.xphelper.ext.descriptor
+import top.sacz.xphelper.ext.toClass
 import top.sacz.xphelper.ext.toMethodFinder
 import top.sacz.xphelper.reflect.MethodUtils
 
@@ -46,8 +49,7 @@ class DexkitTest {
     private fun startFindMethod() {
         val startTime = System.currentTimeMillis()
         val method = DexFinder.findMethod {
-            usedString =
-                arrayOf("com/tencent/mm/ui/PlusSubMenuHelper\$MenuItemView", "compatCallBack")
+            usedString = arrayOf("com/tencent/mm/ui/PlusSubMenuHelper\$MenuItemView", "compatCallBack")
             paramCount = 3
             isParamCount = true
         }.first()

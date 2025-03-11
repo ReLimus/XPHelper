@@ -32,7 +32,7 @@ class MethodInfo {
             finder.parameters(*parameters!!)
         }
         if (usedString != null) {
-            finder.useString(*usedString!!)
+            finder.usedString(*usedString!!)
         }
         if (invokeMethods != null) {
             finder.invokeMethods(*invokeMethods!!)
@@ -44,7 +44,7 @@ class MethodInfo {
             finder.usingNumbers(*usingNumbers!!)
         }
         if (usedFields != null) {
-            finder.usedField(*usedFields!!)
+            finder.usedFields(*usedFields!!)
         }
         if (searchPackages != null) {
             finder.searchPackages(*searchPackages!!)
