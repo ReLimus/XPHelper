@@ -32,6 +32,14 @@ public class DexKitCache {
         return new DexKitCacheProxy().getFieldList(key);
     }
 
+    public static void putClassList(String key, List<Class<?>> classList) {
+        new DexKitCacheProxy().putClassList(key, classList);
+    }
+
+    public static List<Class<?>> getClassList(String key) {
+        return new DexKitCacheProxy().getClassList(key);
+    }
+
     public static String getAllMethodString() {
         return new DexKitCacheProxy().toString();
     }

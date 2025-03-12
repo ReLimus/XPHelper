@@ -13,10 +13,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import top.sacz.xphelper.base.BaseDexQuery;
 import top.sacz.xphelper.dexkit.cache.DexKitCache;
 import top.sacz.xphelper.reflect.ClassUtils;
 
-public class MethodFinder {
+public class MethodFinder extends BaseDexQuery {
 
     private Class<?> declaredClass;//方法声明类
     private final List<Class<?>> parameters = new ArrayList<>();//方法的参数列表

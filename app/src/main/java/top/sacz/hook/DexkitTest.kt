@@ -10,11 +10,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import top.sacz.hook.ext.showToast
 import top.sacz.xphelper.dexkit.DexFinder
-import top.sacz.xphelper.dexkit.FieldFinder
-import top.sacz.xphelper.dexkit.MethodFinder
-import top.sacz.xphelper.ext.descriptor
-import top.sacz.xphelper.ext.toClass
-import top.sacz.xphelper.ext.toMethodFinder
 import top.sacz.xphelper.reflect.MethodUtils
 
 class DexkitTest {
@@ -52,16 +47,21 @@ class DexkitTest {
             usedString = arrayOf("com/tencent/mm/ui/PlusSubMenuHelper\$MenuItemView", "compatCallBack")
             paramCount = 3
             isParamCount = true
-        }.first()
+        }
         val field = DexFinder.findField {
-            declaredClass = method.declaringClass
-            readMethods = arrayOf(method.toMethodFinder())
-        }.first()
+            declaredClass = method.firstOrNull().declaringClass
+            readMethods = arrayOf(method)
+        }
+        val clazz = DexFinder.findClass {
+            fields = arrayOf(field)
+            methods = arrayOf(method)
+        }
         val endTime = System.currentTimeMillis()
         """
             ${endTime - startTime}ms ->
-            method:${method.descriptor}
-            field:${field.descriptor}
+            ClassHasCache:${clazz.existCache()}-${clazz.firstOrNull().name}
+            MethodHasCache:${method.existCache()}-${method.firstOrNull()}
+            FieldHasCache:${field.existCache()}-${field.firstOrNull()}
         """.trimMargin().showToast()
     }
 }

@@ -3,9 +3,10 @@ package top.sacz.xphelper.dexkit
 
 import org.luckypray.dexkit.DexKitBridge
 import top.sacz.xphelper.XpHelper
-import top.sacz.xphelper.dexkit.cache.DexKitCache
+import top.sacz.xphelper.dexkit.bean.ClassInfo
 import top.sacz.xphelper.dexkit.bean.FieldInfo
 import top.sacz.xphelper.dexkit.bean.MethodInfo
+import top.sacz.xphelper.dexkit.cache.DexKitCache
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicBoolean
@@ -71,6 +72,11 @@ object DexFinder {
         return newInfo.generate()
     }
 
+    @JvmSynthetic
+    fun findClass(classInfo: ClassInfo.() -> Unit): ClassFinder {
+        val newInfo = ClassInfo().also(classInfo)
+        return newInfo.generate()
+    }
 
     /**
      * 清空缓存

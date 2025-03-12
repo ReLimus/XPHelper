@@ -14,10 +14,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import top.sacz.xphelper.base.BaseDexQuery;
 import top.sacz.xphelper.dexkit.cache.DexKitCache;
 import top.sacz.xphelper.reflect.ClassUtils;
 
-public class FieldFinder {
+public class FieldFinder extends BaseDexQuery {
 
     private Class<?> declaredClass;        // 字段声明类
     private String fieldName;              // 字段名称

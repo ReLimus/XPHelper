@@ -6,7 +6,6 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -129,6 +128,41 @@ public class DexKitCacheProxy {
         result.put("DeclareClass", declareClass);
         result.put("FieldName", fieldName);
         result.put("FieldType", field.getType().getName());
+        return result.toString();
+    }
+
+    public void putClassList(String key, List<Class<?>> classList) {
+        ArrayList<String> infoList = new ArrayList<>();
+        for (Class<?> clazz : classList) {
+            infoList.add(getClassInfoJSON(clazz));
+        }
+        configUtils.put(key, infoList);
+    }
+
+    public List<Class<?>> getClassList(String key) {
+        if (!configUtils.containsKey(key)) {
+            return null;
+        }
+        ArrayList<Class<?>> result = new ArrayList<>();
+        ArrayList<String> classInfoList = configUtils.getObject(key, new TypeReference<>() {
+        });
+        if (classInfoList != null) {
+            for (String classInfo : classInfoList) {
+                result.add(findClassByJSONString(classInfo));
+            }
+        }
+        return result;
+    }
+
+    public Class<?> findClassByJSONString(String classInfoJSON) {
+        JSONObject classInfo = JSONObject.parseObject(classInfoJSON);
+        String className = classInfo.getString("ClassName");
+        return ClassUtils.findClass(className);
+    }
+
+    private String getClassInfoJSON(Class<?> clazz) {
+        JSONObject result = new JSONObject();
+        result.put("ClassName", clazz.getName());
         return result.toString();
     }
 
