@@ -1,5 +1,7 @@
 package top.sacz.xphelper.dexkit;
 
+import androidx.annotation.NonNull;
+
 import org.luckypray.dexkit.query.FindField;
 import org.luckypray.dexkit.query.enums.MatchType;
 import org.luckypray.dexkit.query.matchers.FieldMatcher;
@@ -24,11 +26,11 @@ public class FieldFinder {
     private boolean isModifiers = false;
     private MatchType matchType;
 
-    private String[] searchPackages;       // 搜索包
-    private String[] excludePackages;      // 排除包
+    private final List<String> searchPackages = new ArrayList<>();       // 搜索包
+    private final List<String> excludePackages = new ArrayList<>();      // 排除包
 
-    private MethodFinder[] readMethods;
-    private MethodFinder[] writeMethods;
+    private final List<MethodFinder> readMethods = new ArrayList<>();
+    private final List<MethodFinder> writeMethods = new ArrayList<>();
 
     /**
      * 构建器模式
@@ -72,7 +74,7 @@ public class FieldFinder {
      * @return
      */
     public FieldFinder readMethods(MethodFinder... readMethods) {
-        this.readMethods = readMethods;
+        this.readMethods.addAll(Arrays.asList(readMethods));
         return this;
     }
     /**
@@ -82,9 +84,8 @@ public class FieldFinder {
      * @return
      */
     public FieldFinder readMethods(Method... readMethods) {
-        this.readMethods = new MethodFinder[readMethods.length];
-        for (int i = 0; i < readMethods.length; i++) {
-            this.readMethods[i] = MethodFinder.from(readMethods[i]);
+        for (Method readMethod : readMethods) {
+            this.readMethods.add(MethodFinder.from(readMethod));
         }
         return this;
     }
@@ -96,7 +97,7 @@ public class FieldFinder {
      * @return
      */
     public FieldFinder writeMethods(MethodFinder... writeMethods) {
-        this.writeMethods = writeMethods;
+        this.writeMethods.addAll(Arrays.asList(writeMethods));
         return this;
     }
 
@@ -107,9 +108,8 @@ public class FieldFinder {
      * @return
      */
     public FieldFinder writeMethods(Method... writeMethods) {
-        this.writeMethods = new MethodFinder[writeMethods.length];
-        for (int i = 0; i < writeMethods.length; i++) {
-            this.writeMethods[i] = MethodFinder.from(writeMethods[i]);
+        for (Method writeMethod : writeMethods) {
+            this.writeMethods.add(MethodFinder.from(writeMethod));
         }
         return this;
     }
@@ -161,57 +161,35 @@ public class FieldFinder {
         return this;
     }
 
-    /**
-     * 设置搜索包过滤
-     *
-     * @param packages 搜索包数组
-     * @return 当前FieldFinder实例
-     */
     public FieldFinder searchPackages(String... packages) {
-        this.searchPackages = packages;
+        this.searchPackages.addAll(Arrays.asList(packages));
         return this;
     }
 
-    /**
-     * 设置排除包过滤
-     *
-     * @param packages 排除包数组
-     * @return 当前FieldFinder实例
-     */
     public FieldFinder excludePackages(String... packages) {
-        this.excludePackages = packages;
+        this.excludePackages.addAll(Arrays.asList(packages));
         return this;
     }
 
-    /**
-     * 构建FindField查询对象
-     *
-     * @return FindField实例
-     */
     private FindField buildFindField() {
         FindField findField = FindField.create();
-        if (searchPackages != null) findField.searchPackages(searchPackages);
-        if (excludePackages != null) findField.excludePackages(excludePackages);
+        if (!searchPackages.isEmpty()) findField.searchPackages(searchPackages.toArray(new String[0]));
+        if (!excludePackages.isEmpty()) findField.excludePackages(excludePackages.toArray(new String[0]));
         return findField.matcher(buildFieldMatcher());
     }
 
-    /**
-     * 构建FieldMatcher匹配器
-     *
-     * @return FieldMatcher实例
-     */
     public FieldMatcher buildFieldMatcher() {
         FieldMatcher matcher = FieldMatcher.create();
         if (declaredClass != null) matcher.declaredClass(declaredClass);
         if (fieldName != null) matcher.name(fieldName);
         if (fieldType != null) matcher.type(fieldType);
         if (isModifiers) matcher.modifiers(modifiers, matchType);
-        if (readMethods != null) {
+        if (!readMethods.isEmpty()) {
             for (MethodFinder readMethod : readMethods) {
                 matcher.addReadMethod(readMethod.buildMethodMatcher());
             }
         }
-        if (writeMethods != null) {
+        if (!writeMethods.isEmpty()) {
             for (MethodFinder writeMethod : writeMethods) {
                 matcher.addWriteMethod(writeMethod.buildMethodMatcher());
             }
@@ -273,6 +251,7 @@ public class FieldFinder {
         return list.get(0);
     }
 
+    @NonNull
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -280,8 +259,10 @@ public class FieldFinder {
         if (fieldName != null) sb.append(fieldName);
         if (fieldType != null) sb.append(fieldType.getName());
         if (isModifiers) sb.append(modifiers);
-        if (searchPackages != null) sb.append(Arrays.toString(searchPackages));
-        if (excludePackages != null) sb.append(Arrays.toString(excludePackages));
+        if (!searchPackages.isEmpty()) sb.append(searchPackages);
+        if (!excludePackages.isEmpty()) sb.append(excludePackages);
+        if (!readMethods.isEmpty()) sb.append(readMethods);
+        if (!writeMethods.isEmpty()) sb.append(writeMethods);
         return sb.toString();
     }
 }

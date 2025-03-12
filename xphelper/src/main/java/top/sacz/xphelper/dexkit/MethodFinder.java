@@ -1,5 +1,6 @@
 package top.sacz.xphelper.dexkit;
 
+import org.jetbrains.annotations.NotNull;
 import org.luckypray.dexkit.query.FindMethod;
 import org.luckypray.dexkit.query.enums.MatchType;
 import org.luckypray.dexkit.query.matchers.MethodMatcher;
@@ -18,22 +19,22 @@ import top.sacz.xphelper.reflect.ClassUtils;
 public class MethodFinder {
 
     private Class<?> declaredClass;//方法声明类
-    private Class<?>[] parameters;//方法的参数列表
+    private final List<Class<?>> parameters = new ArrayList<>();//方法的参数列表
     private String methodName;//方法名称
     private Class<?> returnType;//方法的返回值类型
-    private String[] usedString;//方法中使用的字符串列表
-    private Method[] invokeMethods;//方法中调用的方法列表
-    private Method[] callMethods;//调用了该方法的方法列表
-    private long[] usingNumbers;//方法中使用的数字列表
+    private final List<String> usedString = new ArrayList<>();//方法中使用的字符串列表
+    private final List<Method> invokeMethods = new ArrayList<>();//方法中调用的方法列表
+    private final List<Method> callMethods = new ArrayList<>();//调用了该方法的方法列表
+    private final List<Long> usingNumbers = new ArrayList<>();//方法中使用的数字列表
     private int paramCount;//参数数量
     private boolean isParamCount = false;
     private int modifiers;//修饰符
     private boolean isModifiers = false;
     private MatchType matchType;
-    private String[] searchPackages;
-    private String[] excludePackages;
+    private final List<String> searchPackages = new ArrayList<>();
+    private final List<String> excludePackages = new ArrayList<>();
 
-    private FieldFinder[] usedFields;
+    private final List<FieldFinder> usedFields = new ArrayList<>();
 
     /**
      * 构造实例
@@ -63,7 +64,7 @@ public class MethodFinder {
     public static MethodFinder from(Method method) {
         MethodFinder methodFinder = new MethodFinder();
         methodFinder.declaredClass = method.getDeclaringClass();
-        methodFinder.parameters = method.getParameterTypes();
+        methodFinder.parameters.addAll(Arrays.asList(method.getParameterTypes()));
         methodFinder.methodName = method.getName();
         methodFinder.returnType = method.getReturnType();
         methodFinder.isModifiers = true;
@@ -79,7 +80,7 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder usedFields(FieldFinder... fieldFinders) {
-        usedFields = fieldFinders;
+        usedFields.addAll(Arrays.asList(fieldFinders));
         return this;
     }
 
@@ -90,9 +91,8 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder usedFields(Field... fields) {
-        usedFields = new FieldFinder[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            usedFields[i] = FieldFinder.from(fields[i]);
+        for (Field field : fields) {
+            usedFields.add(FieldFinder.from(field));
         }
         return this;
     }
@@ -115,7 +115,7 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder parameters(Class<?>... parameters) {
-        this.parameters = parameters;
+        this.parameters.addAll(Arrays.asList(parameters));
         return this;
     }
 
@@ -148,7 +148,7 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder invokeMethods(Method... methods) {
-        invokeMethods = methods;
+        this.invokeMethods.addAll(Arrays.asList(methods));
         return this;
     }
 
@@ -159,7 +159,7 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder callMethods(Method... methods) {
-        this.callMethods = methods;
+        this.callMethods.addAll(Arrays.asList(methods));
         return this;
     }
 
@@ -170,7 +170,9 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder usingNumbers(long... numbers) {
-        this.usingNumbers = numbers;
+        for (long number : numbers) {
+            this.usingNumbers.add(number);
+        }
         return this;
     }
 
@@ -193,7 +195,7 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder usedString(String... strings) {
-        this.usedString = strings;
+        this.usedString.addAll(Arrays.asList(strings));
         return this;
     }
 
@@ -218,7 +220,7 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder searchPackages(String... strings) {
-        this.searchPackages = strings;
+        this.searchPackages.addAll(Arrays.asList(strings));
         return this;
     }
 
@@ -229,22 +231,20 @@ public class MethodFinder {
      * @return
      */
     public MethodFinder excludePackages(String... strings) {
-        this.excludePackages = strings;
+        this.excludePackages.addAll(Arrays.asList(strings));
         return this;
     }
 
-
     private FindMethod buildFindMethod() {
         FindMethod findMethod = FindMethod.create();
-        if (searchPackages != null) {
-            findMethod.searchPackages(searchPackages);
+        if (!searchPackages.isEmpty()) {
+            findMethod.searchPackages(searchPackages.toArray(new String[0]));
         }
-        if (excludePackages != null) {
-            findMethod.excludePackages(excludePackages);
+        if (!excludePackages.isEmpty()) {
+            findMethod.excludePackages(excludePackages.toArray(new String[0]));
         }
         return findMethod.matcher(buildMethodMatcher());
     }
-
 
     /**
      * 构造dexkit method方法的匹配条件
@@ -261,30 +261,31 @@ public class MethodFinder {
         if (returnType != null) {
             methodMatcher.returnType(returnType);
         }
-        if (usedString != null && usedString.length != 0) {
-            methodMatcher.usingStrings(usedString);
+        if (!usedString.isEmpty()) {
+            methodMatcher.usingStrings(usedString.toArray(new String[0]));
         }
-        if (parameters != null) {
+
+        if (!parameters.isEmpty()) {
             for (Class<?> parameterClass : parameters) {
                 methodMatcher.addParamType(parameterClass);
             }
         }
-        if (usedFields != null) {
+        if (!usedFields.isEmpty()) {
             for (FieldFinder usedField : usedFields) {
                 methodMatcher.addUsingField(usedField.buildFieldMatcher());
             }
         }
-        if (invokeMethods != null) {
+        if (!invokeMethods.isEmpty()) {
             for (Method invokeMethod : invokeMethods) {
                 methodMatcher.addInvoke(MethodMatcher.create(invokeMethod));
             }
         }
-        if (callMethods != null) {
+        if (!callMethods.isEmpty()) {
             for (Method callMethod : callMethods) {
                 methodMatcher.addCaller(MethodMatcher.create(callMethod));
             }
         }
-        if (usingNumbers != null) {
+        if (!usingNumbers.isEmpty()) {
             for (long usingNumber : usingNumbers) {
                 methodMatcher.addUsingNumber(usingNumber);
             }
@@ -302,7 +303,6 @@ public class MethodFinder {
      * 查找方法 返回结果列表
      *
      * @return
-     * @throws NoSuchMethodException
      */
     public List<Method> find() {
         try {
@@ -354,6 +354,7 @@ public class MethodFinder {
     }
 
 
+    @NotNull
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -367,20 +368,20 @@ public class MethodFinder {
         if (returnType != null) {
             builder.append(returnType.getName());
         }
-        if (parameters != null) {
-            builder.append(Arrays.toString(parameters));
+        if (!parameters.isEmpty()) {
+            builder.append((parameters));
         }
-        if (invokeMethods != null) {
-            builder.append(Arrays.toString(invokeMethods));
+        if (!invokeMethods.isEmpty()) {
+            builder.append((invokeMethods));
         }
-        if (callMethods != null) {
-            builder.append(Arrays.toString(callMethods));
+        if (!callMethods.isEmpty()) {
+            builder.append((callMethods));
         }
-        if (usedFields != null) {
-            builder.append(Arrays.toString(usedFields));
+        if (!usedFields.isEmpty()) {
+            builder.append((usedFields));
         }
-        if (usingNumbers != null) {
-            builder.append(Arrays.toString(usingNumbers));
+        if (!usingNumbers.isEmpty()) {
+            builder.append((usingNumbers));
         }
         if (isParamCount) {
             builder.append(paramCount);
@@ -388,14 +389,14 @@ public class MethodFinder {
         if (isModifiers) {
             builder.append(modifiers);
         }
-        if (usedString != null && usedString.length != 0) {
-            builder.append(Arrays.toString(usedString));
+        if (!usedString.isEmpty()) {
+            builder.append((usedString));
         }
-        if (searchPackages != null) {
-            builder.append(Arrays.toString(searchPackages));
+        if (!searchPackages.isEmpty()) {
+            builder.append((searchPackages));
         }
-        if (excludePackages != null) {
-            builder.append(Arrays.toString(excludePackages));
+        if (!excludePackages.isEmpty()) {
+            builder.append((excludePackages));
         }
         return builder.toString();
     }

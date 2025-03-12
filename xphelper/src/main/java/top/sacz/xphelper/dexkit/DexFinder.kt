@@ -51,19 +51,21 @@ object DexFinder {
      * 得到dexkit实例
      */
     @JvmStatic
-    fun getDexKitBridge(): DexKitBridge? {
+    fun getDexKitBridge(): DexKitBridge {
         if (dexKitBridge == null) {
             create(XpHelper.context.applicationInfo.sourceDir)
         }
         resetTimer()
-        return dexKitBridge
+        return dexKitBridge!!
     }
 
+    @JvmSynthetic
     fun findMethod(methodInfo: MethodInfo.() -> Unit): MethodFinder {
         val newInfo = MethodInfo().also(methodInfo)
         return newInfo.generate()
     }
 
+    @JvmSynthetic
     fun findField(fieldInfo: FieldInfo.() -> Unit): FieldFinder {
         val newInfo = FieldInfo().also(fieldInfo)
         return newInfo.generate()
