@@ -211,32 +211,39 @@ public class DexMethodDescriptor implements Serializable {
         return toString().hashCode();
     }
 
+
     public Constructor<?> getConstructorInstance(ClassLoader classLoader) throws NoSuchMethodException {
         try {
-            Class<?> clz = classLoader.loadClass(
-                    declaringClass.substring(1, declaringClass.length() - 1).replace('/', '.'));
-            for (Constructor<?> m : clz.getConstructors()) {
-                if (m.getName().equals(name) && getConstructorTypeSig(m).equals(signature)) {
+            String className = declaringClass.substring(1, declaringClass.length() - 1).replace('/', '.');
+            Class<?> clz = classLoader.loadClass(className);
+            // 检查当前类的构造函数
+            for (Constructor<?> m : clz.getDeclaredConstructors()) {
+                if (getConstructorTypeSig(m).equals(signature)) {
                     return m;
                 }
             }
-            while ((clz = clz.getSuperclass()) != null) {
-                for (Constructor<?> m : clz.getConstructors()) {
-                    if (Modifier.isPrivate(m.getModifiers()) || Modifier
-                            .isStatic(m.getModifiers())) {
+            // 遍历父类
+            Class<?> superClass = clz.getSuperclass();
+            while (superClass != null) {
+                for (Constructor<?> m : superClass.getDeclaredConstructors()) {
+                    int modifiers = m.getModifiers();
+                    if (Modifier.isPrivate(modifiers) || Modifier.isStatic(modifiers)) {
                         continue;
                     }
-                    if (m.getName().equals(name) && getConstructorTypeSig(m).equals(signature)) {
+                    if (getConstructorTypeSig(m).equals(signature)) {
                         return m;
                     }
                 }
+                superClass = superClass.getSuperclass();
             }
             throw new NoSuchMethodException(declaringClass + "->" + name + signature);
         } catch (ClassNotFoundException e) {
-            throw (NoSuchMethodException) new NoSuchMethodException(
-                    declaringClass + "->" + name + signature).initCause(e);
+            NoSuchMethodException exception = new NoSuchMethodException(declaringClass + "->" + name + signature);
+            exception.initCause(e);
+            throw exception;
         }
     }
+
 
     public Method getMethodInstance(ClassLoader classLoader) throws NoSuchMethodException {
         try {
