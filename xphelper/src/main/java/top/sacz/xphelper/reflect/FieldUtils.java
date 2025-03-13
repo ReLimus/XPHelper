@@ -96,6 +96,12 @@ public class FieldUtils extends BaseFinder<Field> {
         return this;
     }
 
+    private boolean matchParentClass = false;
+
+    public FieldUtils setMatchParentClass(boolean matchParentClass) {
+        this.matchParentClass = matchParentClass;
+        return this;
+    }
     @Override
     public FieldUtils find() {
         //查找缓存
@@ -109,7 +115,7 @@ public class FieldUtils extends BaseFinder<Field> {
         Field[] declaredFields = getDeclaringClass().getDeclaredFields();
         result.addAll(Arrays.asList(declaredFields));
         //过滤类型
-        result.removeIf(field -> fieldType != null && !CheckClassType.checkType(field.getType(), fieldType));
+        result.removeIf(field -> fieldType != null && !CheckClassType.checkType(field.getType(), fieldType, matchParentClass));
         //过滤名称
         result.removeIf(field -> fieldName != null && !field.getName().equals(fieldName));
         //写入缓存

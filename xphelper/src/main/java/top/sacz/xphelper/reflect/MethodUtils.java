@@ -16,22 +16,27 @@ public class MethodUtils extends BaseFinder<Method> {
     private Class<?> returnType;
     private Class<?>[] methodParams;
     private Integer paramCount;
+    private boolean matchParentClass = false;
 
+    public static Method getMethodByDescriptor(String desc) throws NoSuchMethodException {
+        Method method = new DexMethodDescriptor(desc).getMethodInstance(ClassUtils.getClassLoader());
+        method.setAccessible(true);
+        return method;
+    }
 
     public static String getDescriptor(Method method) {
         return new DexMethodDescriptor(method).getDescriptor();
     }
 
-    public static Method getMethodByDescriptor(String desc) throws NoSuchMethodException {
-        Method method =  new DexMethodDescriptor(desc).getMethodInstance(ClassUtils.getClassLoader());
+    public static Method getMethodByDescriptor(String desc, ClassLoader classLoader) throws NoSuchMethodException {
+        Method method = new DexMethodDescriptor(desc).getMethodInstance(classLoader);
         method.setAccessible(true);
         return method;
     }
 
-    public static Method getMethodByDescriptor(String desc, ClassLoader classLoader) throws NoSuchMethodException {
-        Method method =  new DexMethodDescriptor(desc).getMethodInstance(classLoader);
-        method.setAccessible(true);
-        return method;
+    public MethodUtils setMatchParentClass(boolean matchParentClass) {
+        this.matchParentClass = matchParentClass;
+        return this;
     }
 
     public static MethodUtils create(Object target) {
@@ -79,7 +84,7 @@ public class MethodUtils extends BaseFinder<Method> {
         Method[] methods = getDeclaringClass().getDeclaredMethods();
         result.addAll(Arrays.asList(methods));
         result.removeIf(method -> methodName != null && !method.getName().equals(methodName));
-        result.removeIf(method -> returnType != null && !CheckClassType.checkType(method.getReturnType(), returnType));
+        result.removeIf(method -> returnType != null && !CheckClassType.checkType(method.getReturnType(), returnType, matchParentClass));
         result.removeIf(method -> paramCount != null && method.getParameterCount() != paramCount);
         result.removeIf(method -> methodParams != null && !paramEquals(method.getParameterTypes()));
         writeToMethodCache(result);
@@ -90,7 +95,7 @@ public class MethodUtils extends BaseFinder<Method> {
         for (int i = 0; i < methodParams.length; i++) {
             Class<?> type = methodParams[i];
             Class<?> findType = this.methodParams[i];
-            if (findType == Ignore.class || CheckClassType.checkType(type, findType)) {
+            if (findType == Ignore.class || CheckClassType.checkType(type, findType, matchParentClass)) {
                 continue;
             }
             return false;
@@ -100,18 +105,17 @@ public class MethodUtils extends BaseFinder<Method> {
 
     @Override
     public String buildSign() {
-        StringBuilder build = new StringBuilder();
-        build.append("method:")
-                .append(fromClassName)
-                .append(" ")
-                .append(returnType)
-                .append(" ")
-                .append(methodName)
-                .append("(")
-                .append(paramCount)
-                .append(Arrays.toString(methodParams))
-                .append(")");
-        return build.toString();
+        String build = "method:" +
+                fromClassName +
+                " " +
+                returnType +
+                " " +
+                methodName +
+                "(" +
+                paramCount +
+                Arrays.toString(methodParams) +
+                ")";
+        return build;
     }
 
     private <T> T tryCall(Method method, Object object, Object... args) {

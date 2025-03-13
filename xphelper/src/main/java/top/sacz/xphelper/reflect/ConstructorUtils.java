@@ -51,6 +51,13 @@ public class ConstructorUtils extends BaseFinder<Constructor<?>> {
         return this;
     }
 
+    private boolean matchParentClass = false;
+
+    public ConstructorUtils setMatchParentClass(boolean matchParentClass) {
+        this.matchParentClass = matchParentClass;
+        return this;
+    }
+
     @Override
     public BaseFinder<Constructor<?>> find() {
         //查找缓存
@@ -71,7 +78,7 @@ public class ConstructorUtils extends BaseFinder<Constructor<?>> {
         for (int i = 0; i < methodParams.length; i++) {
             Class<?> type = methodParams[i];
             Class<?> findType = this.paramTypes[i];
-            if (findType == Ignore.class || CheckClassType.checkType(type, findType)) {
+            if (findType == Ignore.class || CheckClassType.checkType(type, findType, matchParentClass)) {
                 continue;
             }
             return false;
