@@ -53,7 +53,7 @@ public class ConstructorUtils extends BaseFinder<Constructor<?>> {
 
     private boolean matchParentClass = false;
 
-    public ConstructorUtils setMatchParentClass(boolean matchParentClass) {
+    public ConstructorUtils matchParentClass(boolean matchParentClass) {
         this.matchParentClass = matchParentClass;
         return this;
     }

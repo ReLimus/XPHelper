@@ -98,7 +98,7 @@ public class FieldUtils extends BaseFinder<Field> {
 
     private boolean matchParentClass = false;
 
-    public FieldUtils setMatchParentClass(boolean matchParentClass) {
+    public FieldUtils matchParentClass(boolean matchParentClass) {
         this.matchParentClass = matchParentClass;
         return this;
     }

@@ -34,7 +34,7 @@ public class MethodUtils extends BaseFinder<Method> {
         return method;
     }
 
-    public MethodUtils setMatchParentClass(boolean matchParentClass) {
+    public MethodUtils matchParentClass(boolean matchParentClass) {
         this.matchParentClass = matchParentClass;
         return this;
     }
