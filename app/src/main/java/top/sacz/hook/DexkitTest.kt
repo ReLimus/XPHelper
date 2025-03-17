@@ -46,7 +46,6 @@ class DexkitTest {
         val method = DexFinder.findMethod {
             usedString = arrayOf("com/tencent/mm/ui/PlusSubMenuHelper\$MenuItemView", "compatCallBack")
             paramCount = 3
-            isParamCount = true
         }
         val field = DexFinder.findField {
             declaredClass = method.firstOrNull().declaringClass
