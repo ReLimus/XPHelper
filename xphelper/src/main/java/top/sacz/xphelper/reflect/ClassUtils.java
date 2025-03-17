@@ -68,6 +68,14 @@ public class ClassUtils {
         return name.startsWith("androidx.") || name.startsWith("android.") || name.startsWith("kotlin.") || name.startsWith("kotlinx.") || name.startsWith("com.tencent.mmkv.") || name.startsWith("com.android.tools.r8.") || name.startsWith("com.google.android.") || name.startsWith("com.google.gson.") || name.startsWith("com.google.common.") || name.startsWith("com.microsoft.appcenter.") || name.startsWith("org.intellij.lang.annotations.") || name.startsWith("org.jetbrains.annotations.");
     }
 
+    public static Class<?> findClassOrNull(String className) {
+        try {
+            return findClass(className);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     /**
      * 获取类
      */
