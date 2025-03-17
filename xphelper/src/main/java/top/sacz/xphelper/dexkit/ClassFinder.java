@@ -8,6 +8,7 @@ import org.luckypray.dexkit.query.matchers.ClassMatcher;
 import org.luckypray.dexkit.result.ClassData;
 import org.luckypray.dexkit.result.ClassDataList;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,11 +24,13 @@ public class ClassFinder extends BaseDexQuery {
     private final List<String> excludePackages = new ArrayList<>();      // 排除包过滤
     private final List<FieldFinder> fields = new ArrayList<>();          // 包含的字段
     private final List<MethodFinder> methods = new ArrayList<>();        // 包含的方法
+    private final List<String> usedString = new ArrayList<>();//类方法中使用的字符串列表
+
     private String className;              // 类名匹配
     private String superClass;           // 父类匹配
-    private int modifiers;                 // 修饰符
-    private boolean isModifiers = false;
-    private MatchType matchType;
+    private int modifiers = -1;                 // 修饰符
+
+    private MatchType matchType = MatchType.Contains;
 
     public static ClassFinder build() {
         return new ClassFinder();
@@ -41,9 +44,19 @@ public class ClassFinder extends BaseDexQuery {
             finder.interfaces.add(interfaceClass.getName());
         }
         finder.modifiers = clazz.getModifiers();
-        finder.isModifiers = true;
         finder.matchType = MatchType.Equals;
         return finder;
+    }
+
+    /**
+     * 设置方法中使用的字符串列表
+     *
+     * @param strings
+     * @return
+     */
+    public ClassFinder usedString(String... strings) {
+        this.usedString.addAll(Arrays.asList(strings));
+        return this;
     }
 
     public ClassFinder className(String name) {
@@ -63,7 +76,6 @@ public class ClassFinder extends BaseDexQuery {
 
     public ClassFinder modifiers(int modifiers, MatchType matchType) {
         this.modifiers = modifiers;
-        this.isModifiers = true;
         this.matchType = matchType;
         return this;
     }
@@ -107,7 +119,12 @@ public class ClassFinder extends BaseDexQuery {
                 matcher.addInterface(interfaceClassName);
             }
         }
-        if (isModifiers) matcher.modifiers(modifiers, matchType);
+        if (!usedString.isEmpty()) {
+            matcher.usingStrings(usedString);
+        }
+        if (modifiers != -1) {
+            matcher.modifiers(modifiers, matchType);
+        }
         if (!fields.isEmpty()) {
             for (FieldFinder field : fields) {
                 matcher.addField(field.buildFieldMatcher());
@@ -165,7 +182,7 @@ public class ClassFinder extends BaseDexQuery {
         if (className != null) sb.append(className);
         if (superClass != null) sb.append(superClass);
         if (!interfaces.isEmpty()) sb.append(interfaces);
-        if (isModifiers) sb.append(modifiers);
+        if (modifiers != -1) sb.append(Modifier.toString(modifiers));
         if (!searchPackages.isEmpty()) sb.append(searchPackages);
         if (!excludePackages.isEmpty()) sb.append(excludePackages);
         if (!fields.isEmpty()) sb.append(fields);

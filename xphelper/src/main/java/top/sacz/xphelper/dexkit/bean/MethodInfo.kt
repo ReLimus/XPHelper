@@ -15,10 +15,8 @@ class MethodInfo {
     var callMethods: Array<Method>? = null //调用了该方法的方法列表
     var usingNumbers: LongArray? = null //方法中使用的数字列表
     var paramCount = -1 //参数数量
-    var isParamCount = false
-    var modifiers = 0 //修饰符
-    var isModifiers = false
-    var matchType: MatchType? = null
+    var modifiers = -1 //修饰符
+    var matchType: MatchType = MatchType.Contains
     var searchPackages: Array<String>? = null
     var excludePackages: Array<String>? = null
     var usedFields: Array<FieldFinder>? = null
@@ -52,10 +50,10 @@ class MethodInfo {
         if (excludePackages != null) {
             finder.excludePackages(*excludePackages!!)
         }
-        if (isModifiers) {
-            finder.modifiers(modifiers, matchType!!)
+        if (modifiers != -1) {
+            finder.modifiers(modifiers, matchType)
         }
-        if (isParamCount) {
+        if (paramCount != -1) {
             finder.paramCount(paramCount)
         }
         return finder

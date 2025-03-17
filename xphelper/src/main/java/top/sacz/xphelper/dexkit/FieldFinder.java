@@ -10,6 +10,7 @@ import org.luckypray.dexkit.result.FieldDataList;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,9 +24,8 @@ public class FieldFinder extends BaseDexQuery {
     private Class<?> declaredClass;        // 字段声明类
     private String fieldName;              // 字段名称
     private Class<?> fieldType;            // 字段类型
-    private int modifiers;                 // 修饰符
-    private boolean isModifiers = false;
-    private MatchType matchType;
+    private int modifiers = -1;                 // 修饰符
+    private MatchType matchType = MatchType.Contains;
 
     private final List<String> searchPackages = new ArrayList<>();       // 搜索包
     private final List<String> excludePackages = new ArrayList<>();      // 排除包
@@ -63,7 +63,6 @@ public class FieldFinder extends BaseDexQuery {
         finder.fieldName = field.getName();
         finder.fieldType = field.getType();
         finder.modifiers = field.getModifiers();
-        finder.isModifiers = true;
         finder.matchType = MatchType.Equals;
         return finder;
     }
@@ -157,7 +156,6 @@ public class FieldFinder extends BaseDexQuery {
      */
     public FieldFinder modifiers(int modifiers, MatchType matchType) {
         this.modifiers = modifiers;
-        this.isModifiers = true;
         this.matchType = matchType;
         return this;
     }
@@ -184,7 +182,7 @@ public class FieldFinder extends BaseDexQuery {
         if (declaredClass != null) matcher.declaredClass(declaredClass);
         if (fieldName != null) matcher.name(fieldName);
         if (fieldType != null) matcher.type(fieldType);
-        if (isModifiers) matcher.modifiers(modifiers, matchType);
+        if (modifiers != -1) matcher.modifiers(modifiers, matchType);
         if (!readMethods.isEmpty()) {
             for (MethodFinder readMethod : readMethods) {
                 matcher.addReadMethod(readMethod.buildMethodMatcher());
@@ -259,7 +257,7 @@ public class FieldFinder extends BaseDexQuery {
         if (declaredClass != null) sb.append(declaredClass.getName());
         if (fieldName != null) sb.append(fieldName);
         if (fieldType != null) sb.append(fieldType.getName());
-        if (isModifiers) sb.append(modifiers);
+        if (modifiers != -1) sb.append(Modifier.toString(modifiers));
         if (!searchPackages.isEmpty()) sb.append(searchPackages);
         if (!excludePackages.isEmpty()) sb.append(excludePackages);
         if (!readMethods.isEmpty()) sb.append(readMethods);

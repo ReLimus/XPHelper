@@ -27,11 +27,10 @@ public class MethodFinder extends BaseDexQuery {
     private final List<Method> invokeMethods = new ArrayList<>();//方法中调用的方法列表
     private final List<Method> callMethods = new ArrayList<>();//调用了该方法的方法列表
     private final List<Long> usingNumbers = new ArrayList<>();//方法中使用的数字列表
-    private int paramCount;//参数数量
-    private boolean isParamCount = false;
-    private int modifiers;//修饰符
-    private boolean isModifiers = false;
-    private MatchType matchType;
+    private int paramCount = -1;//参数数量
+    private int modifiers = -1;//修饰符
+
+    private MatchType matchType = MatchType.Contains;
     private final List<String> searchPackages = new ArrayList<>();
     private final List<String> excludePackages = new ArrayList<>();
 
@@ -68,7 +67,6 @@ public class MethodFinder extends BaseDexQuery {
         methodFinder.parameters.addAll(Arrays.asList(method.getParameterTypes()));
         methodFinder.methodName = method.getName();
         methodFinder.returnType = method.getReturnType();
-        methodFinder.isModifiers = true;
         methodFinder.modifiers = method.getModifiers();
         methodFinder.matchType = MatchType.Equals;
         return methodFinder;
@@ -185,7 +183,6 @@ public class MethodFinder extends BaseDexQuery {
      */
     public MethodFinder paramCount(int count) {
         this.paramCount = count;
-        this.isParamCount = true;
         return this;
     }
 
@@ -209,7 +206,6 @@ public class MethodFinder extends BaseDexQuery {
      */
     public MethodFinder modifiers(int modifiers, MatchType matchType) {
         this.modifiers = modifiers;
-        this.isModifiers = true;
         this.matchType = matchType;
         return this;
     }
@@ -291,10 +287,10 @@ public class MethodFinder extends BaseDexQuery {
                 methodMatcher.addUsingNumber(usingNumber);
             }
         }
-        if (isParamCount) {
+        if (paramCount != -1) {
             methodMatcher.paramCount(paramCount);
         }
-        if (isModifiers) {
+        if (modifiers != -1) {
             methodMatcher.modifiers(modifiers, matchType);
         }
         return methodMatcher;
@@ -384,10 +380,10 @@ public class MethodFinder extends BaseDexQuery {
         if (!usingNumbers.isEmpty()) {
             builder.append((usingNumbers));
         }
-        if (isParamCount) {
+        if (paramCount != -1) {
             builder.append(paramCount);
         }
-        if (isModifiers) {
+        if (modifiers != -1) {
             builder.append(modifiers);
         }
         if (!usedString.isEmpty()) {
