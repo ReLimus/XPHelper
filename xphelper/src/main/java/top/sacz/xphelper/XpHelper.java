@@ -5,6 +5,7 @@ import android.content.Context;
 
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import top.sacz.xphelper.activity.ActivityProxyManager;
+import top.sacz.xphelper.dexkit.cache.DexKitCache;
 import top.sacz.xphelper.reflect.ClassUtils;
 import top.sacz.xphelper.util.ActivityTools;
 import top.sacz.xphelper.util.ConfigUtils;
@@ -22,6 +23,7 @@ public class XpHelper {
         ClassUtils.intiClassLoader(classLoader);
         ConfigUtils.initialize(application);
         ActivityProxyManager.initActivityProxyManager(application);
+        DexKitCache.checkCacheExpired(application);
     }
 
     public static void initZygote(IXposedHookZygoteInit.StartupParam startupParam) {

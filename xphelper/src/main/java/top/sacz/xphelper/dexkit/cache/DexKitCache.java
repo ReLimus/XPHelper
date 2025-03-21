@@ -1,6 +1,8 @@
 package top.sacz.xphelper.dexkit.cache;
 
 
+import android.content.Context;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -9,6 +11,10 @@ public class DexKitCache {
 
     public static void clearCache() {
         new DexKitCacheProxy().clearCache();
+    }
+
+    public static void checkCacheExpired(Context context) {
+        new DexKitCacheProxy().checkCacheExpired(context);
     }
 
     public static boolean exist(String key) {

@@ -1,5 +1,11 @@
 package top.sacz.xphelper.dexkit.cache;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.alibaba.fastjson2.JSONArray;
@@ -18,8 +24,35 @@ import top.sacz.xphelper.reflect.MethodUtils;
 import top.sacz.xphelper.util.ConfigUtils;
 
 public class DexKitCacheProxy {
+    private static final String TAG = "DexKitCacheProxy";
 
     ConfigUtils configUtils = new ConfigUtils("DexKitCache");
+
+    public void checkCacheExpired(Context context) {
+        //获取应用的版本号
+        try {
+            String key = "version";
+            String packageName = context.getPackageName();
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, 0);
+            String versionName = packageInfo.versionName;
+            long versionCode = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                versionCode = packageInfo.getLongVersionCode();
+            } else {
+                versionCode = packageInfo.versionCode;
+            }
+            String versionFlag = versionName + "_" + versionCode;
+            String configFlag = configUtils.getString(key, "");
+            if (configFlag.equals(versionFlag)) {
+                return;
+            }
+            clearCache();
+            configUtils.put(key, versionFlag);
+            Log.d(TAG, "checkCacheExpired: Host version updated Cache cleaned old:" + configFlag + " new:" + versionFlag);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.d(TAG, "checkCacheExpired: " + Log.getStackTraceString(e));
+        }
+    }
 
     public Set<String> keys() {
         return configUtils.getAllKeys();
