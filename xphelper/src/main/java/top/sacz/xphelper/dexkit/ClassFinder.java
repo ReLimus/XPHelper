@@ -145,7 +145,6 @@ public class ClassFinder extends BaseDexQuery {
 
             ArrayList<Class<?>> result = new ArrayList<>();
             ClassDataList dataList = DexFinder.getDexKitBridge().findClass(buildFindClass());
-
             if (dataList.isEmpty()) {
                 DexKitCache.putClassList(toString(), result);
                 return result;
@@ -155,7 +154,6 @@ public class ClassFinder extends BaseDexQuery {
                 Class<?> clazz = data.getInstance(ClassUtils.getClassLoader());
                 result.add(clazz);
             }
-
             DexKitCache.putClassList(toString(), result);
             return result;
         } catch (Exception e) {
@@ -178,7 +176,7 @@ public class ClassFinder extends BaseDexQuery {
     @NotNull
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("cf");
         if (className != null) sb.append(className);
         if (superClass != null) sb.append(superClass);
         if (!interfaces.isEmpty()) sb.append(interfaces);

@@ -253,7 +253,7 @@ public class FieldFinder extends BaseDexQuery {
     @NonNull
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("ff");
         if (declaredClass != null) sb.append(declaredClass.getName());
         if (fieldName != null) sb.append(fieldName);
         if (fieldType != null) sb.append(fieldType.getName());

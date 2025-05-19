@@ -354,7 +354,7 @@ public class MethodFinder extends BaseDexQuery {
     @NotNull
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder("mf");
         //拼入字段值 无需拼入字段名 如果为空则不拼入
         if (declaredClass != null) {
             builder.append(declaredClass.getName());
