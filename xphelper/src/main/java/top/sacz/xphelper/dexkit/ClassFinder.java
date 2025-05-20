@@ -179,6 +179,7 @@ public class ClassFinder extends BaseDexQuery {
         StringBuilder sb = new StringBuilder("cf");
         if (className != null) sb.append(className);
         if (superClass != null) sb.append(superClass);
+        if (!usedString.isEmpty()) sb.append(usedString);
         if (!interfaces.isEmpty()) sb.append(interfaces);
         if (modifiers != -1) sb.append(Modifier.toString(modifiers));
         if (!searchPackages.isEmpty()) sb.append(searchPackages);
