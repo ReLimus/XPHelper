@@ -111,37 +111,33 @@ public class ClassUtils {
             if (clazz != null) {
                 return clazz;
             }
-            if (className.endsWith(";") || className.contains("/")) {
+            if (className.endsWith(";") || className.contains("/") || className.contains("L")) {
                 className = className.replace('/', '.');
-                if (className.endsWith(";")) {
-                    if (className.charAt(0) == 'L') {
-                        className = className.substring(1, className.length() - 1);
-                    } else {
-                        className = className.substring(0, className.length() - 1);
-                    }
+                // 处理所有 L 开头的情况（无论是否有分号）
+                if (className.startsWith("L")) {
+                    int endIndex = className.endsWith(";")
+                            ? className.length() - 1
+                            : className.length();
+                    className = className.substring(1, endIndex);
+                } else if (className.endsWith(";")) {
+                    className = className.substring(0, className.length() - 1);
                 }
             }
-            //可能是数组类型的
             if (className.startsWith("[")) {
-                int index = className.lastIndexOf('[');
-                //获取原类型
-                try {
-                    clazz = getBaseTypeClass(className.substring(index + 1));
-                } catch (Exception e) {
-                    clazz = super.loadClass(className.substring(index + 1));
+                int dimension = 0;
+                while (className.charAt(dimension) == '[') {
+                    dimension++;
                 }
-                //转换数组类型
-                for (int i = 0; i < className.length(); i++) {
-                    char ch = className.charAt(i);
-                    if (ch == '[') {
-                        clazz = Array.newInstance(clazz, 0).getClass();
-                    } else {
-                        break;
-                    }
+                String componentType = className.substring(dimension);
+                // 递归处理组件类型（确保组件类型被规范化）
+                Class<?> componentClass = loadClass(componentType); // 改为递归调用
+                for (int i = 0; i < dimension; i++) {
+                    componentClass = Array.newInstance(componentClass, 0).getClass();
                 }
-                CLASS_CACHE.put(className, clazz);
-                return clazz;
+                CLASS_CACHE.put(className, componentClass);
+                return componentClass;
             }
+
             //可能是基础类型
             try {
                 clazz = getBaseTypeClass(className);
