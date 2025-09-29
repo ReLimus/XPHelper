@@ -12,7 +12,7 @@ import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicBoolean
 
 object DexFinder {
-    private val isLoadLibrary = AtomicBoolean()
+    val isLoadLibrary = AtomicBoolean()
     private var dexKitBridge: DexKitBridge? = null
     private var timer: Timer? = null
 
