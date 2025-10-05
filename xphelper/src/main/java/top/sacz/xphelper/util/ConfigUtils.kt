@@ -1,8 +1,8 @@
 package top.sacz.xphelper.util
 
 import android.content.Context
-import com.alibaba.fastjson2.JSON
-import com.alibaba.fastjson2.TypeReference
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import io.fastkv.FastKV
 import io.fastkv.interfaces.FastCipher
 
@@ -20,6 +20,8 @@ class ConfigUtils @JvmOverloads constructor(
     private var id: String = key
 
     private var kv: FastKV
+
+    private val gson = Gson()
 
 
     init {
@@ -97,7 +99,7 @@ class ConfigUtils @JvmOverloads constructor(
             }
 
             else -> {
-                kv.putString(key, JSON.toJSONString(value))
+                kv.putString(key, gson.toJson(value))
             }
         }
     }
@@ -140,16 +142,16 @@ class ConfigUtils @JvmOverloads constructor(
         if (data.isNullOrEmpty()) {
             return null
         }
-        return JSON.parseObject(data, clz)
+        return gson.fromJson(data, clz)
     }
 
 
-    fun <T> getObject(key: String, type: TypeReference<T>): T? {
+    fun <T> getObject(key: String, type: java.lang.reflect.Type): T? {
         val data = kv.getString(key)
         if (data.isNullOrEmpty()) {
             return null
         }
-        return JSON.parseObject(data, type)
+        return gson.fromJson(data, type)
     }
 
 
@@ -158,7 +160,9 @@ class ConfigUtils @JvmOverloads constructor(
         if (data.isNullOrEmpty()) {
             return ArrayList()
         }
-        return JSON.parseArray(data, clazz)
+        val type =
+            TypeToken.getParameterized(MutableList::class.java, clazz).type
+        return gson.fromJson(data, type)
     }
 
     /**
