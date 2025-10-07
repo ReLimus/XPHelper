@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace 'top.sacz.mingo'
+    namespace 'top.sacz.hook'
     compileSdk 36
 
     defaultConfig {

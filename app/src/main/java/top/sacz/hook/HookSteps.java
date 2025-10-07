@@ -3,9 +3,6 @@ package top.sacz.hook;
 import android.content.Context;
 import android.content.ContextWrapper;
 
-import com.kongzue.dialogx.DialogX;
-import com.kongzue.dialogxmaterialyou.style.MaterialYouStyle;
-
 import java.lang.reflect.Method;
 
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -45,13 +42,6 @@ public class HookSteps {
     }
 
     public void initHook(Context context) {
-        initDialogX(context);
         new DexkitTest().hook();
-    }
-
-    private void initDialogX(Context context) {
-        DialogX.init(context);
-        DialogX.globalTheme = DialogX.THEME.AUTO;
-        DialogX.globalStyle = new MaterialYouStyle();
     }
 }
