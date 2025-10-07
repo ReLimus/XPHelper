@@ -1,20 +1,20 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace 'top.sacz.hook'
-    compileSdk 35
+    namespace 'top.sacz.mingo'
+    compileSdk 36
 
     defaultConfig {
         applicationId "top.sacz.hook"
         minSdk 26
-        targetSdk 35
+        targetSdk 36
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     aaptOptions {
@@ -23,16 +23,19 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = '11'
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
 }
 
@@ -42,11 +45,5 @@ dependencies {
     implementation libs.material
     implementation libs.core.ktx
     compileOnly  libs.xposed.api
-    var dialogXVersion = "0.0.50.beta32"
-    //引入DialogX主体
-    implementation("com.github.suzhelan.DialogX:DialogX:$dialogXVersion")
-    //非必须 DialogX官方提供的主题样式
-    implementation("com.github.suzhelan.DialogX:DialogXMaterialYou:$dialogXVersion")
     implementation project(":xphelper")
-//    implementation 'com.github.suzhelan:XpHelper:v1.2'
 }
