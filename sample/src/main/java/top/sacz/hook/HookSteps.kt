@@ -42,6 +42,6 @@ class HookSteps {
         }
     }
     fun initHook(context: Context?) {
-        DexkitTest().hook()
+        DexkitTest.startLoad()
     }
 }
